@@ -2,6 +2,7 @@ const {
   sendSuccess,
   sendError,
   capitalizeFirst,
+  sendNotFound,
 } = require("../helpers/helpers");
 const pool = require("../db/db");
 
@@ -58,16 +59,40 @@ exports.getStudentById = async (req, res) => {
     const id = Number(req.params.id);
     if (Number.isNaN(id)) {
       return sendError(res, 400, "Invalid id");
-    } else {
-      const result = await pool.query("SELECT * FROM students WHERE id = $1", [
-        id,
-      ]);
-      if (result.rows.length === 0)
-        return sendError(res, 404, "Student not found");
-      return sendSuccess(res, 200, result.rows);
     }
+    const result = await pool.query("SELECT * FROM students WHERE id = $1", [
+      id,
+    ]);
+    if (result.rows.length === 0)
+      return sendError(res, 404, "Student not found");
+    return sendSuccess(res, 200, result.rows[0]);
   } catch (error) {
     console.error(error);
     return sendError(res, 500, error);
+  }
+};
+
+exports.addStudent = async (req, res) => {
+  try {
+    const { firstname, lastname, address, city, batch } = req.body;
+
+    if (!lastname || !firstname) {
+      return sendError(
+        res,
+        400,
+        `${!firstname ? "First Name" : "Last Name"} is required`,
+      );
+    }
+    const result = await pool.query(
+      `INSERT INTO students
+   (firstname, lastname, address, city, batch)
+   VALUES ($1, $2, $3, $4, $5)
+   RETURNING *`,
+      [firstname, lastname, address, city, batch],
+    );
+    return sendSuccess(res, 201, result.rows[0]);
+  } catch (error) {
+    console.log(error);
+    return sendError(res, 500, "something went wrong");
   }
 };
