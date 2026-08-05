@@ -27,6 +27,7 @@ function updateError(body) {
   let errors = [];
   if (body.length === 0) errors.push("Empty body");
 }
+
 function capitalizeFirst(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
