@@ -52,3 +52,22 @@ exports.getAllStudents = async (req, res) => {
     sendError(res, 500, "Internal server error");
   }
 };
+
+exports.getStudentById = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return sendError(res, 400, "Invalid id");
+    } else {
+      const result = await pool.query("SELECT * FROM students WHERE id = $1", [
+        id,
+      ]);
+      if (result.rows.length === 0)
+        return sendError(res, 404, "Student not found");
+      return sendSuccess(res, 200, result.rows);
+    }
+  } catch (error) {
+    console.error(error);
+    return sendError(res, 500, error);
+  }
+};
