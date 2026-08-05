@@ -96,3 +96,53 @@ exports.addStudent = async (req, res) => {
     return sendError(res, 500, "something went wrong");
   }
 };
+
+exports.updateStudent = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { firstname, lastname, address, city, batch } = req.body;
+    if (Number.isNaN(id)) {
+      return sendError(res, 400, "Invalid id");
+    }
+    if (!lastname || !firstname) {
+      return sendError(
+        res,
+        400,
+        `${!firstname ? "First Name" : "Last Name"} is required`,
+      );
+    }
+    const result = await pool.query(
+      `UPDATE students
+       SET
+      firstname = $1,
+      lastname = $2,
+      address = $3,
+      city = $4,
+      batch = $5
+      WHERE id = $6
+      RETURNING *`,
+      [firstname, lastname, address, city, batch, id],
+    );
+    return sendSuccess(res, 201, result.rows[0]);
+  } catch (error) {
+    console.log(error);
+    return sendError(res, 500, "something went wrong");
+  }
+};
+
+exports.deleteStudent = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return sendError(res, 400, "Invalid id");
+    }
+    const result = await pool.query(
+      "DELETE from students where id = $1 RETURNING *",
+      [id],
+    );
+    return sendSuccess(res, 200, result.rows[0]);
+  } catch (error) {
+    console.log(error);
+    return sendError(res, 500, "something went wrong");
+  }
+};

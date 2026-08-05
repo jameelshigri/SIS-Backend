@@ -21,6 +21,12 @@ function sendNotFound(res, status, result) {
       error: "No record found",
     });
 }
+
+function updateError(body) {
+  let schema = [firstname, lastname, address, city, batch];
+  let errors = [];
+  if (body.length === 0) errors.push("Empty body");
+}
 function capitalizeFirst(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
