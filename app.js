@@ -1,5 +1,6 @@
 const express = require("express");
 const studentRoutes = require("./routes/studentRoutes");
+const departmentRoutes = require("./routes/departmentRoutes");
 const app = express();
 
 const pool = require("./db/db");
@@ -8,6 +9,8 @@ require("dotenv").config();
 app.use(express.json());
 
 app.use("/students", studentRoutes);
+
+app.use("/departments", departmentRoutes);
 
 const PORT = process.env.PORT || 3000;
 
